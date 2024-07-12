@@ -10,6 +10,7 @@ using Ecom_ShoppingCartAPI;
 using Ecom_ShoppingCartAPI.Service;
 using Ecom_ShoppingCartAPI.Utility;
 using Ecom.MessageBus;
+using Ecom_ShoppingCartAPI.RabbitMQSender;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +33,9 @@ builder.Services.AddScoped<IProductService,ProductService>();
 // Add CoupanService
 builder.Services.AddScoped<ICoupanService,CoupanService>();
 //Add message bus service
-builder.Services.AddScoped<IMessageBus,MessageBus>();
+//builder.Services.AddScoped<IMessageBus,MessageBus>();
+//Now using rabbitmq
+builder.Services.AddScoped<IRabbitMQCartSender, RabbitMQCartSender>();
 
 // register delegating hanlder 
 builder.Services.AddScoped<BackendAPIAuthenticationHttpClientHandler>();

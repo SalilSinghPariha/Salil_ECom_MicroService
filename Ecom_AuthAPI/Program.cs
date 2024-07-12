@@ -2,6 +2,7 @@ using Ecom.MessageBus;
 using Ecom.Services.AuthAPI.Data;
 using Ecom_AuthAPI.Models;
 using Ecom_AuthAPI.Models.Dto;
+using Ecom_AuthAPI.RabbitMQSender;
 using Ecom_AuthAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options=>
 //Register AuthService
 builder.Services.AddScoped<IAuthService, AuthService> ();
 //Inject message bus for  publish message
-builder.Services.AddScoped<IMessageBus, MessageBus>();
+//builder.Services.AddScoped<IMessageBus, MessageBus>();
+//Inject message bus for  publish message
+builder.Services.AddScoped<IRabbitMQAuthSender, RabbitMQAuthSender>();
 
 //for jwt token
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
