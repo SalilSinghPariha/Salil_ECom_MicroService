@@ -19,6 +19,11 @@ var optionBuilder= new DbContextOptionsBuilder<ApplicationDbContext>();
 optionBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.AddSingleton(new EmailService(optionBuilder.Options));
 
+// automatically start the rabbitmq service so we need to inject it
+builder.Services.AddHostedService<RabbitMQAuthConsumer>();
+// register RabbitMQCartConsumer
+builder.Services.AddHostedService<RabbitMQCartConsumer>();
+
 builder.Services.AddSingleton<IAzureServiceBusConsumer,AzureServiceBusConsumer>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

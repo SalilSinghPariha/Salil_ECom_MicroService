@@ -1,6 +1,7 @@
 ﻿using Ecom.MessageBus;
 using Ecom.Services.CoupanAPI.Models.Dto;
 using Ecom_AuthAPI.Models.Dto;
+using Ecom_AuthAPI.RabbitMQSender;
 using Ecom_AuthAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,18 +14,20 @@ namespace Ecom_AuthAPI.Controllers
     public class AuthAPIController : ControllerBase
     {
         private readonly IAuthService authService;
-        private readonly IMessageBus _messageBus;
+        //private readonly IMessageBus _messageBus;
+        private readonly IRabbitMQAuthSender _rabbitMQAuthSender;
         private readonly IConfiguration _configuration;
         protected ResponseDto responseDto;
 
-        public AuthAPIController(IAuthService authService, IConfiguration configuration,IMessageBus messageBus)
+        public AuthAPIController(IAuthService authService, IConfiguration configuration,IRabbitMQAuthSender rabbitMQAuthSender)
         {
 
             this.authService = authService;
             responseDto = new();
 
             _configuration = configuration;
-            _messageBus = messageBus;
+            //_messageBus = messageBus;
+            _rabbitMQAuthSender = rabbitMQAuthSender;
 
         }
         [HttpPost("Register")]
@@ -40,7 +43,7 @@ namespace Ecom_AuthAPI.Controllers
             }
             //publish message to Queue
 
-            await _messageBus.PublishMessage(registerRequestDto.Email,_configuration.GetValue<string>("TopicAndQueueNames:emailRegisterUser"));
+             _rabbitMQAuthSender.SendMessage(registerRequestDto.Email,_configuration.GetValue<string>("TopicAndQueueNames:emailRegisterUser"));
 
             return Ok(responseDto);
         }

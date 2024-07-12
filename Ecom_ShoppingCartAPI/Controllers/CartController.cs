@@ -3,6 +3,7 @@ using Ecom.MessageBus;
 using Ecom_ShoppingCartAPI.Data;
 using Ecom_ShoppingCartAPI.Model;
 using Ecom_ShoppingCartAPI.Model.DTO;
+using Ecom_ShoppingCartAPI.RabbitMQSender;
 using Ecom_ShoppingCartAPI.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,20 +21,22 @@ namespace Ecom_ShoppingCartAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IProductService _productService;
         private readonly ICoupanService _coupanService;
-        private readonly IMessageBus _messageBus;
+       // private readonly IMessageBus _messageBus;
+       private readonly IRabbitMQCartSender _rabbitMQCartSender;
         private readonly IConfiguration _configuration;
 
 
         public CartController(ApplicationDbContext context, IMapper mapper, 
             IProductService productService, ICoupanService coupanService,
-            IMessageBus messageBus,IConfiguration configuration)
+            IRabbitMQCartSender rabbitMQCartSender, IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _responseDto = new ResponseDto();
             _productService = productService;
             _coupanService = coupanService;
-            _messageBus = messageBus;
+            // _messageBus = messageBus;
+            _rabbitMQCartSender = rabbitMQCartSender;
             _configuration = configuration;
         }
         [HttpPost("CartUpsert")]
@@ -248,7 +251,7 @@ namespace Ecom_ShoppingCartAPI.Controllers
         {
             try
             {
-                await _messageBus.PublishMessage(cartDTO, 
+                _rabbitMQCartSender.SendMessage(cartDTO, 
                     _configuration.GetValue<string>("TopicAndQueueNames:EmailShoppingCart"));
                 _responseDto.IsSuccess = true;
 
